@@ -5,4 +5,4 @@ log/my_project.log
 *.idea
 /.ipynb_checkpoints/EDA-checkpoint.ipynb
 *report_and_fit.ipynb
-*test_machine_learning.py
+*machine_learning.py
