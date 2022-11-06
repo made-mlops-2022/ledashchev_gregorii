@@ -1,0 +1,6 @@
+.mlops_venv
+log
+log/my_project.log
+ml_project/__pycache__
+notebooks/__pycache__
+tests/__pycache__
