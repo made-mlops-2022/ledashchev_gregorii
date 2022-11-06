@@ -1,7 +1,0 @@
-input_filepath: "data/raw/heart_cleveland_upload.csv"
-output_filepath: "data/processed/transformed/"
-lasso_alpha: 5e-2
-outlier_border: 0.05
-test_ratio: 0.2
-drop_cols: ["cp"]
-target_name: "condition"
