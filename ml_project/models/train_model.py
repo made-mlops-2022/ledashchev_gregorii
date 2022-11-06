@@ -1,7 +1,7 @@
 from sklearn.linear_model import LogisticRegression
 import click
 import pandas as pd
-from load_training_params import read_model_training_params, ModelFittingParams
+from load_training_params import read_model_training_params
 import logging
 import os
 from pathlib import Path
