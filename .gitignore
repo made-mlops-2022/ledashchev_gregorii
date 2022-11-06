@@ -1,6 +1,7 @@
 .mlops_venv
-log
 log/my_project.log
 *__pycache__
 *.ipynb_checkpoints
 *.idea
+/.ipynb_checkpoints/EDA-checkpoint.ipynb
+*report_and_fit.ipynb
