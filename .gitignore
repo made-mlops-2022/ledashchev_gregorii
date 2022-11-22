@@ -6,3 +6,4 @@ log/my_project.log
 /.ipynb_checkpoints/EDA-checkpoint.ipynb
 *report_and_fit.ipynb
 *machine_learning.py
+*.venv
