@@ -3,6 +3,9 @@ from pydantic import BaseModel
 import pandas as pd
 import json
 import joblib
+import os
+
+
 app = FastAPI()
 
 
@@ -13,7 +16,10 @@ class InputDataFrame(BaseModel):
 @app.post("/predict")
 async def create_item(input_data_frame: InputDataFrame):
     df = pd.DataFrame.from_dict(json.loads(input_data_frame.dataframe))
-    model = joblib.load(r'models/linear_model_on_not_transformed.joblib')
+    path_to_model = os.path.join(
+        os.getcwd(), r'app/models/linear_model_on_not_transformed.joblib'
+    )
+    model = joblib.load(path_to_model)
     prediction = model.predict(df)
     return ','.join(tuple(map(str, prediction)))
 
