@@ -63,7 +63,7 @@ Where YOUR_DATAFRAME is
 ```
 This json is a result of ```DataFrame.to_json()```.
 # Testing
-Run
+Being in directory ```/online_inference``` run
 ```python -m pytest```
 # Project structure
 ```
