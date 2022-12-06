@@ -1,0 +1,117 @@
+version: '3.7'
+# ====================================== AIRFLOW ENVIRONMENT VARIABLES =======================================
+x-environment: &airflow_environment
+  - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
+  # - AIRFLOW__CORE__LOAD_EXAMPLES=True
+  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__CORE__STORE_DAG_CODE=True
+  - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
+  - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+  - AIRFLOW__CORE__FERNET_KEY=${FERNET_KEY}
+# LIST YOUR VARIABLES HERE:
+  # path to local folder for data storing
+  - AIRFLOW_VAR_PATH_TO_DATA=/home/gregor/made/my_flow/data
+  # path to local folder for model storing (in universe of healthy people the following two variables are equal):
+  - AIRFLOW_VAR_PATH_TO_MODEL_SAVING=/data/model/{{ ds }}
+  - AIRFLOW_VAR_PATH_TO_MODEL_LOADING=/data/model/{{ ds }}
+
+
+x-airflow-image: &airflow_image apache/airflow:2.3.0-python3.8
+# ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
+services:
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5430:5430"
+  init:
+    build:
+      context: images/airflow-docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: airflow-docker
+    depends_on:
+      - postgres
+    environment: *airflow_environment
+    entrypoint: /bin/bash
+    command: -c 'airflow db init && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
+
+  webserver:
+    build:
+      context: images/airflow-docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: airflow-docker
+
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - logs:/opt/airflow/logs
+    environment: *airflow_environment
+    command: webserver
+
+  scheduler:
+    build:
+      context: images/airflow-docker
+      args:
+        AIRFLOW_BASE_IMAGE: *airflow_image
+    image: airflow-docker
+
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - logs:/opt/airflow/logs
+      - ./dags/:/opt/airflow/dags/
+      - ./data/:/opt/airflow/data/
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment: *airflow_environment
+    command: scheduler
+
+  ml_generate_data:
+    build:
+      context: images/airflow-generate-data
+    image: airflow-generate-data
+    restart: "no"
+
+  ml_process_data:
+    build:
+      context: images/airflow-process-data
+    image: airflow-process-data
+    restart: "no"
+
+  ml_split_data:
+    build:
+      context: images/airflow-split-data
+    image: airflow-split-data
+    restart: "no"
+
+  ml_fit:
+    build:
+      context: images/airflow-fit
+    image: airflow-fit
+    restart: "no"
+
+  ml_validate:
+    build:
+      context: images/airflow-validate
+    image: airflow-validate
+    restart: "no"
+
+  ml_predict:
+    build:
+      context: images/airflow-predict
+    image: airflow-predict
+    restart: "no"
+
+volumes:
+  logs:
+
+
